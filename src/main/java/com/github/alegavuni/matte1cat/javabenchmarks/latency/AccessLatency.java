@@ -15,6 +15,11 @@
  * Main.sequentialAccess_0262144  avgt    3  0,058 ±  0,004  ns/op
  * Main.sequentialAccess_1048576  avgt    3  0,058 ±  0,001  ns/op
  * Main.sequentialAccess_4194304  avgt    3  0,059 ±  0,007  ns/op
+ * <p>
+ * Considerations:
+ * - Sequential access is faster because of CPU cache prefetching.
+ * - Latency increases with array size, especially in random access due to cache misses.
+ * - Results depend on hardware and JVM; consider them as a reference only.
  */
 
 package com.github.alegavuni.matte1cat.javabenchmarks.latency;
