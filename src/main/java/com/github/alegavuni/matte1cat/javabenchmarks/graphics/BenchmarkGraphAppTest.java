@@ -10,6 +10,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.nio.file.Files;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleButton;
+
+
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +28,8 @@ public class BenchmarkGraphAppTest extends Application {
     private static final Logger LOGGER = Logger.getLogger(BenchmarkGraphAppTest.class.getName());
     private final StackPane chartContainer = new StackPane();
     private final ComboBox<String> testSelector = new ComboBox<>();
+    private String lastLoadedJsonRaw = null;
+
 
     // Category → Test options
     private final Map<String, List<String>> testsByCategory = Map.of(
@@ -56,6 +64,11 @@ public class BenchmarkGraphAppTest extends Application {
         // BUTTONS
         Button runButton = new Button("Run Benchmark");
         Button processButton = new Button("Process Result File");
+        Button viewJsonButton = new Button("View Loaded JSON");
+        viewJsonButton.setDisable(true); // initially disabled
+
+        ToggleButton barChartToggle = new ToggleButton("Bar Chart View");
+
 
         runButton.setOnAction(e -> {
             // Optional: use Runtime.getRuntime().exec(...) to trigger benchmark
@@ -69,15 +82,38 @@ public class BenchmarkGraphAppTest extends Application {
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 try {
+                    // Read raw file contents and store it
+                    lastLoadedJsonRaw = Files.readString(file.toPath());
+
                     List<JmhResultEntry> results = JmhResultLoader.load(file);
-                    renderJsonChart(results);
+                    renderJsonChart(results, barChartToggle.isSelected());
+
+                    viewJsonButton.setDisable(false); // enable after loading
                 } catch (IOException ex) {
                     LOGGER.log(Level.SEVERE, "Failed to load JSON file", ex);
                 }
             }
         });
 
-        HBox buttonBox = new HBox(10, runButton, processButton);
+        viewJsonButton.setOnAction(e -> {
+            if (lastLoadedJsonRaw != null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Loaded JSON File");
+                alert.setHeaderText("Raw JSON Content");
+
+                TextArea textArea = new TextArea(lastLoadedJsonRaw);
+                textArea.setEditable(false);
+                textArea.setWrapText(false);
+                textArea.setMaxWidth(Double.MAX_VALUE);
+                textArea.setMaxHeight(Double.MAX_VALUE);
+
+                alert.getDialogPane().setContent(textArea);
+                alert.getDialogPane().setPrefSize(800, 600);
+                alert.showAndWait();
+            }
+        });
+
+        HBox buttonBox = new HBox(10, runButton, processButton, viewJsonButton, barChartToggle);
         VBox topControls = new VBox(10, categorySelector, testSelector, buttonBox);
         BorderPane root = new BorderPane();
         root.setTop(topControls);
@@ -189,14 +225,17 @@ public class BenchmarkGraphAppTest extends Application {
         return chart;
     }
 
-    private void renderJsonChart(List<JmhResultEntry> results) {
+    private void renderJsonChart(List<JmhResultEntry> results, boolean isBarChart) {
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Params");
 
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Score");
 
-        LineChart<String, Number> chart = new LineChart<>(xAxis, yAxis);
+        XYChart<String, Number> chart = isBarChart
+                ? new BarChart<>(xAxis, yAxis)
+                : new LineChart<>(xAxis, yAxis);
+
         chart.setTitle("Imported Benchmark Results");
 
         Map<String, XYChart.Series<String, Number>> seriesMap = new HashMap<>();
