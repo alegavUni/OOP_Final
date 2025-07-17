@@ -29,6 +29,8 @@ public class BenchmarkGraphAppTest extends Application {
     private final StackPane chartContainer = new StackPane();
     private final ComboBox<String> testSelector = new ComboBox<>();
     private String lastLoadedJsonRaw = null;
+    private List<JmhResultEntry> lastParsedResults = null;
+
 
 
     // Category → Test options
@@ -66,9 +68,13 @@ public class BenchmarkGraphAppTest extends Application {
         Button processButton = new Button("Process Result File");
         Button viewJsonButton = new Button("View Loaded JSON");
         viewJsonButton.setDisable(true); // initially disabled
-
         ToggleButton barChartToggle = new ToggleButton("Bar Chart View");
 
+        barChartToggle.setOnAction(e -> {
+            if (lastParsedResults != null) {
+                renderJsonChart(lastParsedResults, barChartToggle.isSelected());
+            }
+        });
 
         runButton.setOnAction(e -> {
             // Optional: use Runtime.getRuntime().exec(...) to trigger benchmark
@@ -85,8 +91,8 @@ public class BenchmarkGraphAppTest extends Application {
                     // Read raw file contents and store it
                     lastLoadedJsonRaw = Files.readString(file.toPath());
 
-                    List<JmhResultEntry> results = JmhResultLoader.load(file);
-                    renderJsonChart(results, barChartToggle.isSelected());
+                    lastParsedResults = JmhResultLoader.load(file);
+                    renderJsonChart(lastParsedResults, barChartToggle.isSelected());
 
                     viewJsonButton.setDisable(false); // enable after loading
                 } catch (IOException ex) {
