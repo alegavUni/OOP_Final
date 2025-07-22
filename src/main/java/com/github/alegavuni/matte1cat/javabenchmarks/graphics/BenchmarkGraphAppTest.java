@@ -290,22 +290,42 @@ public class BenchmarkGraphAppTest extends Application {
 
         chart.layout();
         Platform.runLater(() -> {
-            for (Object rawSeries : chart.getData()) {
-                XYChart.Series<?, ?> series = (XYChart.Series<?, ?>) rawSeries;
-                for (Object rawData : series.getData()) {
-                    XYChart.Data<?, ?> data = (XYChart.Data<?, ?>) rawData;
+            for (XYChart.Series<?, ?> series : chart.getData()) {
+                for (XYChart.Data<?, ?> data : series.getData()) {
                     Node node = data.getNode();
                     if (node instanceof StackPane bar) {
-                        String value;
+                        double baseValue;
+                        double error;
+
                         if (isHorizontalBar) {
-                            value = String.format("%.2f", isLogScale
-                                    ? Math.pow(10, ((Number) data.getXValue()).doubleValue())
-                                    : ((Number) data.getXValue()).doubleValue());
+                            String size = series.getName();
+                            String bench = data.getYValue().toString();
+                            baseValue = ((Number) data.getXValue()).doubleValue();
+                            error = results.stream()
+                                    .filter(e -> e.benchmark.contains(bench) && size.equals(e.params != null ? e.params.get("size") : "default"))
+                                    .map(e -> e.primaryMetric.scoreError)
+                                    .findFirst()
+                                    .orElse(0.0);
                         } else {
-                            value = String.format("%.2f", isLogScale
-                                    ? Math.pow(10, ((Number) data.getYValue()).doubleValue())
-                                    : ((Number) data.getYValue()).doubleValue());
+                            String bench = series.getName();
+                            String size = data.getXValue().toString();
+                            baseValue = ((Number) data.getYValue()).doubleValue();
+                            error = results.stream()
+                                    .filter(e -> {
+                                        String label = e.benchmark.substring(e.benchmark.lastIndexOf('.') + 1);
+                                        return label.contains(bench)
+                                                && size.equals(e.params != null ? e.params.get("size") : "default");
+                                    })
+                                    .map(e -> e.primaryMetric.scoreError)
+                                    .findFirst()
+                                    .orElse(0.0);
                         }
+
+                        String value = String.format("%.2f", isLogScale ? Math.pow(10, baseValue) : baseValue);
+                        String errorText = String.format("± %.2f", error);
+
+                        Tooltip tooltip = new Tooltip("Score: " + value + "\nError: " + errorText);
+                        Tooltip.install(bar, tooltip);
 
                         Label label = new Label(value);
                         label.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
@@ -321,6 +341,7 @@ public class BenchmarkGraphAppTest extends Application {
                 }
             }
         });
+
     }
 
 
