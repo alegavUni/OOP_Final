@@ -2,6 +2,7 @@ package com.github.alegavuni.matte1cat.javabenchmarks.graphics;
 
 import com.github.alegavuni.matte1cat.javabenchmarks.benchmarks.AccessLatencyBenchmark;
 import com.github.alegavuni.matte1cat.javabenchmarks.benchmarks.CollectionsBenchmark;
+import com.github.alegavuni.matte1cat.javabenchmarks.benchmarks.FastUtilBenchmark;
 import com.github.alegavuni.matte1cat.javabenchmarks.benchmarks.HashingBenchmark;
 import com.github.alegavuni.matte1cat.javabenchmarks.adapter.JmhResultEntry;
 import com.github.alegavuni.matte1cat.javabenchmarks.adapter.JmhResultLoader;
@@ -29,9 +30,9 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BenchmarkGraphAppTest extends Application {
+public class AppGraphics extends Application {
 
-    private static final Logger LOGGER = Logger.getLogger(BenchmarkGraphAppTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AppGraphics.class.getName());
 
     private final StackPane chartContainer = new StackPane();
     private String lastLoadedJsonRaw = null;
@@ -42,7 +43,7 @@ public class BenchmarkGraphAppTest extends Application {
         stage.setTitle("Java Benchmark Viewer");
 
         ComboBox<String> categorySelector = new ComboBox<>();
-        categorySelector.getItems().addAll("Collections", "Latency", "Hashing");
+        categorySelector.getItems().addAll("Collections", "Latency", "Hashing", "FastUtils");
         categorySelector.setValue("Collections");
 
         Button runButton = new Button("Run Benchmark");
@@ -58,6 +59,7 @@ public class BenchmarkGraphAppTest extends Application {
         new File("results/latency").mkdirs();
         new File("results/collections").mkdirs();
         new File("results/hashing").mkdirs();
+        new File("results/fastutils").mkdirs();
 
         runButton.setOnAction(e -> {
             String category = categorySelector.getValue();
@@ -68,50 +70,13 @@ public class BenchmarkGraphAppTest extends Application {
                 case "Collections" -> ".*CollectionsBenchmark.*";
                 case "Latency" -> ".*AccessLatencyBenchmark.*";
                 case "Hashing" -> ".*HashingBenchmarks.*";
+                case "FastUtil" -> ".*FastUtilBenchmark.*";
                 default -> throw new IllegalArgumentException("Unknown category: " + category);
             };
 
             new Thread(() -> {
                 try {
-                    Options opt = switch (category) {
-                        case "Collections" -> new OptionsBuilder()
-                                .include(CollectionsBenchmark.class.getName())
-                                .warmupIterations(2)
-                                .warmupTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
-                                .measurementIterations(3)
-                                .measurementTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
-                                .forks(1)
-                                .mode(org.openjdk.jmh.annotations.Mode.AverageTime)
-                                .timeUnit(java.util.concurrent.TimeUnit.NANOSECONDS)
-                                .result(resultFileName)
-                                .resultFormat(ResultFormatType.JSON)
-                                .build();
-                        case "Latency" -> new OptionsBuilder()
-                                .include(AccessLatencyBenchmark.class.getName())
-                                .warmupIterations(2)
-                                .warmupTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
-                                .measurementIterations(3)
-                                .measurementTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
-                                .forks(1)
-                                .mode(org.openjdk.jmh.annotations.Mode.AverageTime)
-                                .timeUnit(java.util.concurrent.TimeUnit.NANOSECONDS)
-                                .result(resultFileName)
-                                .resultFormat(ResultFormatType.JSON)
-                                .build();
-                        case "Hashing" -> new OptionsBuilder()
-                                .include(HashingBenchmark.class.getName())
-                                .warmupIterations(2)
-                                .warmupTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
-                                .measurementIterations(3)
-                                .measurementTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
-                                .forks(1)
-                                .mode(org.openjdk.jmh.annotations.Mode.AverageTime)
-                                .timeUnit(java.util.concurrent.TimeUnit.NANOSECONDS)
-                                .result(resultFileName)
-                                .resultFormat(ResultFormatType.JSON)
-                                .build();
-                        default -> throw new IllegalArgumentException("Unknown category: " + category);
-                    };
+                    Options opt = buildOptionsForCategory(category, resultFileName);
 
                     new Runner(opt).run();
 
@@ -135,6 +100,21 @@ public class BenchmarkGraphAppTest extends Application {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select Benchmark Result File (.json)");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+
+            String category = categorySelector.getValue().toLowerCase();
+            String folderPath = switch (category) {
+                case "collections" -> "results/collections";
+                case "latency" -> "results/latency";
+                case "hashing" -> "results/hashing";
+                case "fastutils" -> "results/fastutils";
+                default -> "results";
+            };
+
+            File initialDir = new File(folderPath);
+            if (initialDir.exists() && initialDir.isDirectory()) {
+                fileChooser.setInitialDirectory(initialDir);
+            }
+
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 try {
@@ -286,8 +266,6 @@ public class BenchmarkGraphAppTest extends Application {
 
         chartContainer.getChildren().setAll(scrollPane);
 
-
-
         chart.layout();
         Platform.runLater(() -> {
             for (XYChart.Series<?, ?> series : chart.getData()) {
@@ -342,6 +320,29 @@ public class BenchmarkGraphAppTest extends Application {
             }
         });
 
+    }
+
+    private Options buildOptionsForCategory(String category, String resultFileName) {
+        Class<?> benchmarkClass = switch (category) {
+            case "Collections" -> CollectionsBenchmark.class;
+            case "Latency" -> AccessLatencyBenchmark.class;
+            case "Hashing" -> HashingBenchmark.class;
+            case "FastUtils" -> FastUtilBenchmark.class;
+            default -> throw new IllegalArgumentException("Unknown category: " + category);
+        };
+
+        return new OptionsBuilder()
+                .include(benchmarkClass.getName())
+                .warmupIterations(2)
+                .warmupTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
+                .measurementIterations(3)
+                .measurementTime(org.openjdk.jmh.runner.options.TimeValue.milliseconds(500))
+                .forks(1)
+                .mode(org.openjdk.jmh.annotations.Mode.AverageTime)
+                .timeUnit(java.util.concurrent.TimeUnit.NANOSECONDS)
+                .result(resultFileName)
+                .resultFormat(ResultFormatType.JSON)
+                .build();
     }
 
 
