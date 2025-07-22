@@ -133,7 +133,7 @@ public class CollectionsBenchmark {
     private Set<Long> javaLongSet;
     private LongOpenHashSet fastutilLongSet;
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Trial)
     public void setup() {
         Random random = new Random(12345);
 
@@ -177,24 +177,37 @@ public class CollectionsBenchmark {
     }
 
     // Java UUID Benchmarks
-    @Benchmark public boolean javaUuidSet_existing() { return javaUuidSet.contains(existingUuid); }
-    @Benchmark public boolean javaUuidSet_nonExisting() { return javaUuidSet.contains(nonExistingUuid); }
+    @Benchmark
+    public boolean javaUuidSet_existing() { return javaUuidSet.contains(existingUuid); }
+    @Benchmark
+    public boolean javaUuidSet_nonExisting() { return javaUuidSet.contains(nonExistingUuid); }
 
-    @Benchmark public boolean javaUuidList_existing() { return javaUuidList.contains(existingUuid); }
-    @Benchmark public boolean javaUuidList_nonExisting() { return javaUuidList.contains(nonExistingUuid); }
+    @Benchmark
+    public boolean javaUuidList_existing() { return javaUuidList.contains(existingUuid); }
+    @Benchmark
+    public boolean javaUuidList_nonExisting() { return javaUuidList.contains(nonExistingUuid); }
 
     // FastUtil UUID Benchmarks
-    @Benchmark public boolean fastutilUuidSet_existing() { return fastutilUuidSet.contains(existingUuid); }
-    @Benchmark public boolean fastutilUuidSet_nonExisting() { return fastutilUuidSet.contains(nonExistingUuid); }
+    @Benchmark
+    public boolean fastutilUuidSet_existing() { return fastutilUuidSet.contains(existingUuid); }
+    @Benchmark
+    public boolean fastutilUuidSet_nonExisting() { return fastutilUuidSet.contains(nonExistingUuid); }
 
-    @Benchmark public boolean fastutilUuidList_existing() { return fastutilUuidList.contains(existingUuid); }
-    @Benchmark public boolean fastutilUuidList_nonExisting() { return fastutilUuidList.contains(nonExistingUuid); }
+    @Benchmark
+    public boolean fastutilUuidList_existing() { return fastutilUuidList.contains(existingUuid); }
+    @Benchmark
+    public boolean fastutilUuidList_nonExisting() { return fastutilUuidList.contains(nonExistingUuid); }
 
     // Java Long (boxed) Benchmarks
-    @Benchmark public boolean javaLongSet_existing() { return javaLongSet.contains(existingLong); }
-    @Benchmark public boolean javaLongSet_nonExisting() { return javaLongSet.contains(nonExistingLong); }
+    @Benchmark
+    public boolean javaLongSet_existing() { return javaLongSet.contains(existingLong); }
+    @Benchmark
+    public boolean javaLongSet_nonExisting() { return javaLongSet.contains(nonExistingLong); }
 
     // FastUtil Long (primitive) Benchmarks
-    @Benchmark public boolean fastutilLongSet_existing() { return fastutilLongSet.contains(existingLong); }
-    @Benchmark public boolean fastutilLongSet_nonExisting() { return fastutilLongSet.contains(nonExistingLong); }
+    @Benchmark
+    public boolean fastutilLongSet_existing() { return fastutilLongSet.contains(existingLong); }
+    @Benchmark
+    public boolean fastutilLongSet_nonExisting() { return fastutilLongSet.contains(nonExistingLong); }
+
 }

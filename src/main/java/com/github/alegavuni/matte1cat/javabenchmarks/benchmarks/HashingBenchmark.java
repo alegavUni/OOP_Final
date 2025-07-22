@@ -33,7 +33,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import java.util.*;
 
 @State(Scope.Thread)
-public class HashingBenchmarks {
+public class HashingBenchmark {
 
     private static final UUID WORLD_UUID = UUID.randomUUID();
     private static final int WORLD_ID = 42;

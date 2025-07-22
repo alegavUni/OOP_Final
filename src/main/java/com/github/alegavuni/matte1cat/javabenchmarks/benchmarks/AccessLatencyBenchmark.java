@@ -38,7 +38,7 @@ public class AccessLatencyBenchmark {
     private int[] array;
     private int[] randomIndices;
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Trial)
     public void setup() {
         array = new int[MAX_SIZE];
         randomIndices = new int[MAX_SIZE];
