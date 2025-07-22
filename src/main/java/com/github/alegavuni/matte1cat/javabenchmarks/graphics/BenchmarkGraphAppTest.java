@@ -257,7 +257,21 @@ public class BenchmarkGraphAppTest extends Application {
             chart.getData().add(series);
         }
 
-        chartContainer.getChildren().setAll(chart);
+        if (isHorizontalBar) {
+            chart.setMinHeight(80 * allBenchmarks.size()); // enables vertical scroll
+        }
+
+
+        ScrollPane scrollPane = new ScrollPane(chart);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(500); // height of visible area
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // always enable vertical scroll
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        chartContainer.getChildren().setAll(scrollPane);
+
+
 
         chart.layout();
         Platform.runLater(() -> {
