@@ -25,15 +25,14 @@ public class Main {
     public static void main(String[] args) {
         List<BenchmarkInfo> benchmarks = List.of(
                 new BenchmarkInfo("latency", AccessLatencyBenchmark.class),
-                new BenchmarkInfo("collections", CollectionsBenchmark.class),
-                new BenchmarkInfo("hashing", HashingBenchmark.class)
+                new BenchmarkInfo("fastUtil", FastUtilBenchmark.class),
+                new BenchmarkInfo("hashing", HashingBenchmark.class),
+                new BenchmarkInfo("collections", CollectionsBenchmark.class)
         );
 
         createResultFolders(benchmarks);
 
-        for (BenchmarkInfo benchmark : benchmarks) {
-            runBenchmark(benchmark);
-        }
+        benchmarks.forEach(Main::runBenchmark);
     }
 
     private static void createResultFolders(List<BenchmarkInfo> benchmarks) {
