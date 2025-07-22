@@ -22,21 +22,15 @@
  * - Results depend on hardware and JVM; consider them as a reference only.
  */
 
-package com.github.alegavuni.matte1cat.javabenchmarks.latency;
+package com.github.alegavuni.matte1cat.javabenchmarks.benchmarks;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-@Warmup(iterations = 3, time = 1, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 3, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(value = 1)
-public class AccessLatency {
+public class AccessLatencyBenchmark {
 
     // Max size for setup arrays
     private static final int MAX_SIZE = 4_194_304;

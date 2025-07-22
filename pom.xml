@@ -18,6 +18,11 @@
     <dependencies>
         <!-- JMH Benchmarking -->
         <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>8.5.15</version>
+        </dependency>
+        <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
             <version>1.37</version>
@@ -67,7 +72,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.openjdk.jmh.Main</mainClass>
+                                    <mainClass>com.github.alegavuni.matte1cat.javabenchmarks.Main</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
