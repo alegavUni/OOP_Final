@@ -1,4 +1,5 @@
 /**
+ * Results depend on hardware and JVM; consider them as a reference only.
  * Benchmarking results on a Ryzen 7 9700X, DDR5 RAM:
  * Benchmark                      Mode  Cnt  Score    Error  Units
  * Main.randomAccess_0000512      avgt    3  0,170 ±  0,030  ns/op
@@ -17,9 +18,8 @@
  * Main.sequentialAccess_4194304  avgt    3  0,059 ±  0,007  ns/op
  * <p>
  * Considerations:
- * - Sequential access is faster because of CPU cache prefetching.
- * - Latency increases with array size, especially in random access due to cache misses.
- * - Results depend on hardware and JVM; consider them as a reference only.
+ *   - Sequential access is faster because of CPU cache prefetching.
+ *   - Latency increases with array size, especially in random access due to cache misses.
  */
 
 package com.github.alegavuni.matte1cat.javabenchmarks.benchmarks;

@@ -1,28 +1,54 @@
 /**
+ * Results depend on hardware and JVM; consider them as a reference only.
  * Benchmarking results on a Ryzen 7 9700X, DDR5 RAM:
- * Benchmark                                  (size)  Mode  Cnt   Score   Error  Units
- * HashingBenchmarks.testBlockKey                 10  avgt    3   2,987 ± 0,054  ns/op
- * HashingBenchmarks.testBlockKey                100  avgt    3   3,425 ± 0,176  ns/op
- * HashingBenchmarks.testBlockKey               1000  avgt    3   2,986 ± 0,188  ns/op
- * HashingBenchmarks.testBlockKey              10000  avgt    3   3,009 ± 0,067  ns/op
- * HashingBenchmarks.testStringKey                10  avgt    3  52,488 ± 2,552  ns/op
- * HashingBenchmarks.testStringKey               100  avgt    3  52,568 ± 3,480  ns/op
- * HashingBenchmarks.testStringKey              1000  avgt    3  52,496 ± 4,038  ns/op
- * HashingBenchmarks.testStringKey             10000  avgt    3  49,989 ± 1,619  ns/op
- * HashingBenchmarks.testUUIDKey                  10  avgt    3   3,702 ± 0,687  ns/op
- * HashingBenchmarks.testUUIDKey                 100  avgt    3   3,676 ± 0,123  ns/op
- * HashingBenchmarks.testUUIDKey                1000  avgt    3   3,711 ± 0,008  ns/op
- * HashingBenchmarks.testUUIDKey               10000  avgt    3   4,179 ± 0,174  ns/op
- * HashingBenchmarks.testUUIDKey_Fastest          10  avgt    3   3,460 ± 0,048  ns/op
- * HashingBenchmarks.testUUIDKey_Fastest         100  avgt    3   3,472 ± 0,106  ns/op
- * HashingBenchmarks.testUUIDKey_Fastest        1000  avgt    3   3,520 ± 0,125  ns/op
- * HashingBenchmarks.testUUIDKey_Fastest       10000  avgt    3   3,486 ± 0,151  ns/op
- * HashingBenchmarks.testUUIDKey_ObjectsHash      10  avgt    3  14,528 ± 0,913  ns/op
- * HashingBenchmarks.testUUIDKey_ObjectsHash     100  avgt    3  14,424 ± 0,569  ns/op
- * HashingBenchmarks.testUUIDKey_ObjectsHash    1000  avgt    3  14,585 ± 0,405  ns/op
- * HashingBenchmarks.testUUIDKey_ObjectsHash   10000  avgt    3  14,368 ± 0,555  ns/op
+ * Benchmark                                 (size)  Mode  Cnt   Score   Error  Units
+ * HashingBenchmark.testBlockKey                  1  avgt    3   3,036 ± 0,210  ns/op
+ * HashingBenchmark.testBlockKey                  3  avgt    3   3,045 ± 0,265  ns/op
+ * HashingBenchmark.testBlockKey                  5  avgt    3   3,038 ± 0,062  ns/op
+ * HashingBenchmark.testBlockKey                  8  avgt    3   3,044 ± 0,320  ns/op
+ * HashingBenchmark.testBlockKey                 10  avgt    3   3,034 ± 0,121  ns/op
+ * HashingBenchmark.testBlockKey                100  avgt    3   3,423 ± 0,129  ns/op
+ * HashingBenchmark.testBlockKey               1000  avgt    3   2,983 ± 0,157  ns/op
+ * HashingBenchmark.testBlockKey              10000  avgt    3   2,991 ± 0,148  ns/op
+ * HashingBenchmark.testStringKey                 1  avgt    3  53,421 ± 1,797  ns/op
+ * HashingBenchmark.testStringKey                 3  avgt    3  50,110 ± 2,780  ns/op
+ * HashingBenchmark.testStringKey                 5  avgt    3  50,729 ± 1,255  ns/op
+ * HashingBenchmark.testStringKey                 8  avgt    3  53,704 ± 6,687  ns/op
+ * HashingBenchmark.testStringKey                10  avgt    3  52,201 ± 4,391  ns/op
+ * HashingBenchmark.testStringKey               100  avgt    3  52,400 ± 1,662  ns/op
+ * HashingBenchmark.testStringKey              1000  avgt    3  52,583 ± 3,524  ns/op
+ * HashingBenchmark.testStringKey             10000  avgt    3  49,726 ± 2,294  ns/op
+ * HashingBenchmark.testUUIDKey                   1  avgt    3   3,703 ± 0,099  ns/op
+ * HashingBenchmark.testUUIDKey                   3  avgt    3   4,199 ± 0,817  ns/op
+ * HashingBenchmark.testUUIDKey                   5  avgt    3   3,689 ± 0,083  ns/op
+ * HashingBenchmark.testUUIDKey                   8  avgt    3   3,682 ± 0,097  ns/op
+ * HashingBenchmark.testUUIDKey                  10  avgt    3   3,688 ± 0,098  ns/op
+ * HashingBenchmark.testUUIDKey                 100  avgt    3   3,709 ± 0,178  ns/op
+ * HashingBenchmark.testUUIDKey                1000  avgt    3   3,692 ± 0,260  ns/op
+ * HashingBenchmark.testUUIDKey               10000  avgt    3   3,702 ± 0,146  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest           1  avgt    3   3,471 ± 0,154  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest           3  avgt    3   4,083 ± 0,154  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest           5  avgt    3   3,463 ± 0,148  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest           8  avgt    3   4,452 ± 0,153  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest          10  avgt    3   3,476 ± 0,077  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest         100  avgt    3   3,458 ± 0,083  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest        1000  avgt    3   3,471 ± 0,051  ns/op
+ * HashingBenchmark.testUUIDKey_Fastest       10000  avgt    3   3,507 ± 0,216  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash       1  avgt    3  14,509 ± 0,990  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash       3  avgt    3  14,637 ± 0,519  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash       5  avgt    3  14,705 ± 4,487  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash       8  avgt    3  14,572 ± 0,777  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash      10  avgt    3  15,022 ± 0,684  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash     100  avgt    3  14,385 ± 0,555  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash    1000  avgt    3  14,475 ± 0,162  ns/op
+ * HashingBenchmark.testUUIDKey_ObjectsHash   10000  avgt    3  15,433 ± 0,629  ns/op
  * <p>
  * Considerations:
+ *   - BlockKey (128-bit key) hashing is very fast (~3 ns per operation) but not really possible.
+ *   - UUID-based keys hashing ranges around ~3.5 to 4 ns for optimized versions.
+ *   - String keys are much slower (~50 ns per operation).
+ *   - Using Objects.hash() for UUID (Objects generally) keys is slower (~14-15 ns).
+ * Specific hashCode implementations improve performance significantly over default Java or naive hashing.
  */
 
 package com.github.alegavuni.matte1cat.javabenchmarks.benchmarks;
