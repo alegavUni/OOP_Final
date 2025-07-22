@@ -51,6 +51,8 @@ public class BenchmarkGraphAppTest extends Application {
         viewJsonButton.setDisable(true);
 
         ToggleButton barChartToggle = new ToggleButton("Bar Chart View");
+        ToggleButton logScaleToggle = new ToggleButton("Log Scale");
+
 
         // Create subfolders if they don't exist
         new File("results/latency").mkdirs();
@@ -118,7 +120,7 @@ public class BenchmarkGraphAppTest extends Application {
                         lastLoadedJsonRaw = Files.readString(resultFile.toPath());
                         lastParsedResults = JmhResultLoader.load(resultFile);
                         javafx.application.Platform.runLater(() -> {
-                            renderJsonChart(lastParsedResults, barChartToggle.isSelected());
+                            renderJsonChart(lastParsedResults, barChartToggle.isSelected(), logScaleToggle.isSelected());
                             viewJsonButton.setDisable(false);
                         });
                     }
@@ -138,7 +140,7 @@ public class BenchmarkGraphAppTest extends Application {
                 try {
                     lastLoadedJsonRaw = Files.readString(file.toPath());
                     lastParsedResults = JmhResultLoader.load(file);
-                    renderJsonChart(lastParsedResults, barChartToggle.isSelected());
+                    renderJsonChart(lastParsedResults, barChartToggle.isSelected(), logScaleToggle.isSelected());
                     viewJsonButton.setDisable(false);
                 } catch (IOException ex) {
                     LOGGER.log(Level.SEVERE, "Failed to load JSON file", ex);
@@ -166,11 +168,17 @@ public class BenchmarkGraphAppTest extends Application {
 
         barChartToggle.setOnAction(e -> {
             if (lastParsedResults != null) {
-                renderJsonChart(lastParsedResults, barChartToggle.isSelected());
+                renderJsonChart(lastParsedResults, barChartToggle.isSelected(), logScaleToggle.isSelected());
             }
         });
 
-        HBox buttonBox = new HBox(10, runButton, processButton, viewJsonButton, barChartToggle);
+        logScaleToggle.setOnAction(e -> {
+            if (lastParsedResults != null) {
+                renderJsonChart(lastParsedResults, barChartToggle.isSelected(), logScaleToggle.isSelected());
+            }
+        });
+
+        HBox buttonBox = new HBox(10, runButton, processButton, viewJsonButton, barChartToggle, logScaleToggle);
         VBox topControls = new VBox(10, categorySelector, buttonBox);
         BorderPane root = new BorderPane();
         root.setTop(topControls);
@@ -181,7 +189,8 @@ public class BenchmarkGraphAppTest extends Application {
         stage.show();
     }
 
-    private void renderJsonChart(List<JmhResultEntry> results, boolean isBarChart) {
+    private void renderJsonChart(List<JmhResultEntry> results, boolean isBarChart, boolean isLogScale)
+    {
         boolean isHorizontalBar = isBarChart;
 
         Map<String, Map<String, Double>> groupedData = new LinkedHashMap<>();
@@ -244,12 +253,18 @@ public class BenchmarkGraphAppTest extends Application {
             Map<String, Double> dataPoints = entry.getValue();
             List<String> categories = isHorizontalBar ? new ArrayList<>(allBenchmarks) : new ArrayList<>(allSizes);
 
+
             for (String label : categories) {
                 if (dataPoints.containsKey(label)) {
+                    double original = dataPoints.get(label);
+                    if (isLogScale && original <= 0) continue; // skip invalid log values
+                    double displayValue = isLogScale ? Math.log10(original + 1) : original;
+
+
                     if (isHorizontalBar) {
-                        series.getData().add(new XYChart.Data<>(dataPoints.get(label), label));
+                        series.getData().add(new XYChart.Data<>(displayValue, label));
                     } else {
-                        series.getData().add(new XYChart.Data<>(label, dataPoints.get(label)));
+                        series.getData().add(new XYChart.Data<>(label, displayValue));
                     }
                 }
             }
@@ -283,10 +298,15 @@ public class BenchmarkGraphAppTest extends Application {
                     if (node instanceof StackPane bar) {
                         String value;
                         if (isHorizontalBar) {
-                            value = String.format("%.2f", ((Number) data.getXValue()).doubleValue());
+                            value = String.format("%.2f", isLogScale
+                                    ? Math.pow(10, ((Number) data.getXValue()).doubleValue())
+                                    : ((Number) data.getXValue()).doubleValue());
                         } else {
-                            value = String.format("%.2f", ((Number) data.getYValue()).doubleValue());
+                            value = String.format("%.2f", isLogScale
+                                    ? Math.pow(10, ((Number) data.getYValue()).doubleValue())
+                                    : ((Number) data.getYValue()).doubleValue());
                         }
+
                         Label label = new Label(value);
                         label.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
                         bar.getChildren().add(label);
