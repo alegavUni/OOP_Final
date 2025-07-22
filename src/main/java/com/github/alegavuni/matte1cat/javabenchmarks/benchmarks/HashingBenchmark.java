@@ -31,6 +31,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.*;
+import com.github.alegavuni.matte1cat.javabenchmarks.utils.hashing.*;
 
 @State(Scope.Thread)
 public class HashingBenchmark {
@@ -44,7 +45,7 @@ public class HashingBenchmark {
     private final Map<LocationKeyWithUUID_Fastest, Integer> uuidUtilMap = new HashMap<>();
     private final Map<LocationKeyWithUUID_ObjectsHash, Integer> uuidObjectsMap = new HashMap<>();
 
-    @Param({"10", "100", "1000", "10000"})
+    @Param({"1", "3", "5", "8", "10", "100", "1000", "10000"})
     public int size;
 
     public int index;
@@ -105,143 +106,6 @@ public class HashingBenchmark {
     public void testUUIDKey_ObjectsHash(Blackhole bh) {
         LocationKeyWithUUID_ObjectsHash key = new LocationKeyWithUUID_ObjectsHash(WORLD_UUID, xs[index], ys[index], zs[index]);
         bh.consume(uuidObjectsMap.get(key));
-    }
-
-    // --- Key Implementations ---
-
-    public static class StringKey {
-        private final String key;
-
-        public StringKey(int x, int y, int z, UUID worldUuid) {
-            this.key = x + ";" + y + ";" + z + ";" + worldUuid;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return (o instanceof StringKey other) && key.equals(other.key);
-        }
-
-        @Override
-        public int hashCode() {
-            return key.hashCode();
-        }
-    }
-
-    public static class BlockKey128 {
-        private final long hi;
-        private final long lo;
-
-        public BlockKey128(int x, int y, int z, int worldId) {
-            long hx = ((long) x) & 0xFFFFFFFFL;
-            long hy = ((long) y) & 0xFFFFL;
-            this.hi = (hx << 32) | hy;
-
-            long hz = ((long) z) & 0xFFFFFFFFL;
-            long hw = ((long) worldId) & 0xFFL;
-            this.lo = (hz << 32) | hw;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return (o instanceof BlockKey128 other) && this.hi == other.hi && this.lo == other.lo;
-        }
-
-        @Override
-        public int hashCode() {
-            return (int) (hi ^ (hi >>> 32) ^ lo ^ (lo >>> 32));
-        }
-    }
-
-    public static class LocationKeyWithUUID {
-        private final long most;
-        private final long least;
-        private final int x;
-        private final short y;
-        private final int z;
-
-        public LocationKeyWithUUID(UUID uuid, int x, int y, int z) {
-            this.most = uuid.getMostSignificantBits();
-            this.least = uuid.getLeastSignificantBits();
-            this.x = x;
-            this.y = (short) y;
-            this.z = z;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof LocationKeyWithUUID other)) return false;
-            return most == other.most && least == other.least && x == other.x && y == other.y && z == other.z;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 0;
-            hash = 19 * hash + Long.hashCode(most);
-            hash = 19 * hash + Long.hashCode(least);
-            hash = 19 * hash + this.x;
-            hash = 19 * hash + this.y;
-            hash = 19 * hash + this.z;
-            return hash;
-        }
-    }
-
-    public static class LocationKeyWithUUID_Fastest {
-        private final long most;
-        private final long least;
-        private final int x;
-        private final short y;
-        private final int z;
-
-        public LocationKeyWithUUID_Fastest(UUID uuid, int x, int y, int z) {
-            this.most = uuid.getMostSignificantBits();
-            this.least = uuid.getLeastSignificantBits();
-            this.x = x;
-            this.y = (short) y;
-            this.z = z;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof LocationKeyWithUUID_Fastest other)) return false;
-            return most == other.most && least == other.least && x == other.x && y == other.y && z == other.z;
-        }
-
-        @Override
-        public int hashCode() {
-            int h = Long.hashCode(most);
-            h ^= Long.hashCode(least);
-            h ^= x * 0x9E3779B9; // golden ratio prime
-            h ^= (y & 0xFFFF) * 0x85EBCA6B;
-            h ^= z * 0xC2B2AE35;
-            return h;
-        }
-    }
-
-    public static class LocationKeyWithUUID_ObjectsHash {
-        private final long most;
-        private final long least;
-        private final int x;
-        private final short y;
-        private final int z;
-
-        public LocationKeyWithUUID_ObjectsHash(UUID uuid, int x, int y, int z) {
-            this.most = uuid.getMostSignificantBits();
-            this.least = uuid.getLeastSignificantBits();
-            this.x = x;
-            this.y = (short) y;
-            this.z = z;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof LocationKeyWithUUID_ObjectsHash other)) return false;
-            return most == other.most && least == other.least && x == other.x && y == other.y && z == other.z;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(most, least, x, y, z);
-        }
     }
 
 }
